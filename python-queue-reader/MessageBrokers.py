@@ -268,7 +268,7 @@ class Kafka(MessageBroker):
     implementation specific to Apache Kafka.
     """
 
-    def __init__(self, queue_name: str = '', broker: str = '', group_id: str = '', mechanism: str = '', security: str= '', username: str = '', password: str= ''):
+    def __init__(self, queue_name: str = '', broker: str = '', group_id: str = '', mechanism: str = '', security: str = '', username: str = '', password: str = ''):
         """ Initializes the Kafka object.
 
         Parameters:
