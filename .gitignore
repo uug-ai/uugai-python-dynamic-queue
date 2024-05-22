@@ -1,0 +1,4 @@
+build
+dist
+python_queue_reader.egg-info
+.venv

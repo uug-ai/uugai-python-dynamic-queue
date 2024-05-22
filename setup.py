@@ -1,19 +1,16 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 with open('requirements.txt') as f:
     requirements = f.read().splitlines()
 
-with open("README", 'r') as f:
-    long_description = f.read()
-
-long_description=long_description,
-
 setup(
-   name='python-queue-reader',
-   version='1.0',
+   name='python_queue_reader',
+   version='1.1',
    description='Queue reader for python abstracting message brokers such as RabbitMQ', 
    author='uug.ai',
    author_email='', #TODO: Add email
-   packages=['python-queue-reader'],
+   long_description=open('README.md').read(),
+   long_description_content_type='text/markdown',
+   packages=find_packages(),
    install_requires=requirements
 )

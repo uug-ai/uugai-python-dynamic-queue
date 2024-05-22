@@ -4,16 +4,19 @@ MessageBrokers is a Python library that provides a simple and efficient way to w
 
 ## Installation
 To install MessageBrokers, you can use pip:
-...
+`pip install python_queue_reader`
+
+importing in python via:
+`from python_queue_reader import MessageBrokers`
 
 ## Example usage
 The code snippet provided demonstrates the usage of the MessageBrokers library in Python. It showcases how to initialize a connection to a message broker system, receive messages from a queue, send a message to the queue, and close the connection. The library abstracts away the complexities of interacting with different message broker systems, allowing developers to focus on writing their application logic. Let's dive into the details of each feature and method.
 
 ```
-from MessageBrokers import RabbitMQ
+from python_queue_reader import MessageBrokers
 
 # Initialize a connection to RabbitMQ message broker
-rabbitmq = RabbitMQ(queue_name='my_queue', target_queue_name = 'my_target_queue', exchange='my_exchange', host='host', username='guest', password='guest')
+rabbitmq = MessageBrokers.RabbitMQ(queue_name='my_queue', target_queue_name = 'my_target_queue', exchange='my_exchange', host='host', username='guest', password='guest')
 
 # Receive messages from the queue
 messages = rabbitmq.ReceiveMessages()
