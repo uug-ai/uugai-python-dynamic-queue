@@ -5,10 +5,10 @@ with open('requirements.txt') as f:
 
 setup(
    name='python_queue_reader',
-   version='1.1',
+   version='1.0.0',
    description='Queue reader for python abstracting message brokers such as RabbitMQ', 
    author='uug.ai',
-   author_email='', #TODO: Add email
+   author_email='support@uug.ai',
    long_description=open('README.md').read(),
    long_description_content_type='text/markdown',
    packages=find_packages(),
