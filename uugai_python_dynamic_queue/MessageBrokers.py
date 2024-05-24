@@ -3,9 +3,6 @@ import json
 import sys
 import pika
 import time
-import traceback
-import requests
-from python_kerberos_vault_integrator.KerberosVaultIntegrator import KerberosVaultIntegrator
 from confluent_kafka import Producer, Consumer
 
 
@@ -19,30 +16,38 @@ class MessageBroker:
 
     Methods:
     --------
-    ReceiveMessages: Receives messages from the message broker.
-    SendMessage(self): Sends a message through the message broker.
-    Close(self): Closes the connection to the message broker.
+    receive_messages: Receives messages from the message broker.
+    send_messages(self): Sends a message through the message broker.
+    close(self): Closes the connection to the message broker.
     """
+
 
     def __init__(self) -> None:
         """ Initializes the MessageBroker object.
+
         """
         pass
 
-    def ReceiveMessages(self):
-        """ Receives messages from the message broker.
-        """
-        raise NotImplementedError("ReceiveMessages method must be implemented in child class")
 
-    def SendMessage(self):
+    def receive_message(self):
+        """ Receives message from the message broker.
+
+        """
+        raise NotImplementedError("receive_message method must be implemented in child class")
+
+
+    def send_messages(self):
         """ Sends a message through the message broker.
-        """
-        raise NotImplementedError("SendMessage method must be implemented in child class")
 
-    def Close(self):
-        """ Closes the connection to the message broker.
         """
-        raise NotImplementedError("Close method must be implemented in child class")
+        raise NotImplementedError("send_message method must be implemented in child class")
+
+
+    def close(self):
+        """ Closes the connection to the message broker.
+
+        """
+        raise NotImplementedError("close method must be implemented in child class")
     
 
 
@@ -53,7 +58,9 @@ class RabbitMQ(MessageBroker):
 
     This class inherits from the MessageBroker base class and provides
     implementation specific to RabbitMQ.
+
     """
+
 
     def __init__(self, queue_name: str = '', target_queue_name: str = '', exchange: str = '', host: str = '', username: str = '', password: str = ''):
         """ Initializes the RabbitMQ object.
@@ -81,7 +88,7 @@ class RabbitMQ(MessageBroker):
         self.target_queue_name = target_queue_name
         
         # Establish connection to RabbitMQ
-        self.Connect(host, username, password)
+        self.connect()
 
         # Declare quorum queue
         self.readChannel.queue_declare(queue=self.queue_name, durable=True, arguments={
@@ -92,8 +99,10 @@ class RabbitMQ(MessageBroker):
             print("Connection to RabbitMQ is not open")
             sys.exit(1)
 
-    def Connect(self) -> None:
+
+    def connect(self) -> None:
         """ Establishes a connection to RabbitMQ.
+
         """
 
         host = self.host
@@ -122,8 +131,10 @@ class RabbitMQ(MessageBroker):
             self.readChannel = self.connection.channel()
             self.publishChannel = self.connection.channel()
 
-    def ReceiveMessages(self) -> list[dict]:
+
+    def receive_message(self) -> list[dict]:
         """ Receives messages from the RabbitMQ queue.
+
         """
 
         # Check if connection to RabbitMQ is open, if not, reconnect
@@ -146,9 +157,10 @@ class RabbitMQ(MessageBroker):
             return []
 
         # Otherwise, return the received message
-        return [json.loads(body)]
+        return json.loads(body)
 
-    def SendMessage(self, message: str):
+
+    def send_message(self, message: str):
         """ Sends a message to the RabbitMQ queue.
         
         Parameters:
@@ -175,8 +187,9 @@ class RabbitMQ(MessageBroker):
             self.publishChannel.basic_publish(
                 exchange=self.exchange, routing_key=self.target_queue_name, body=message)
 
-    def Close(self) -> bool:
+    def close(self) -> bool:
         """ Closes the connection to RabbitMQ.
+
         """
 
         self.connection.close()
@@ -190,7 +203,9 @@ class SQS(MessageBroker):
 
     This class inherits from the MessageBroker base class and provides
     implementation specific to SQS.
+
     """
+    
 
     def __init__(self, queue_name: str = '', aws_access_key_id: str = '', aws_secret_access_key: str = ''):
         """ Initializes the SQS object.
@@ -219,8 +234,10 @@ class SQS(MessageBroker):
         # Get the SQS queue object by its name
         self.queue = self.sqs.get_queue_by_name(queue_name=self.queue_name)
 
-    def ReceiveMessages(self) -> list[dict]:
-        """ Receives messages from the SQS queue.
+
+    def receive_message(self) -> list[dict]:
+        """ Receives message from the SQS queue.
+
         """
 
         # List to store received messages
@@ -241,20 +258,23 @@ class SQS(MessageBroker):
         # Return the list of received messages
         return messages
 
-    def SendMessage(self, message: str):
+
+    def send_message(self, message: str):
         """ Sends a message to the SQS queue.
         
         Parameters:
         -----------
         message : str
             The message to send to the queue.
+
         """
 
         # Send the message to the SQS queue
         self.queue.send_message(MessageBody=message)
 
-    def Close(self) -> bool:
+    def close(self) -> bool:
         """ Closes the connection to the SQS queue.
+
         """
 
         # Since SQS doesn't require explicit connection management, 
@@ -269,7 +289,9 @@ class Kafka(MessageBroker):
 
     This class inherits from the MessageBroker base class and provides
     implementation specific to Apache Kafka.
+
     """
+
 
     def __init__(self, queue_name: str = '', broker: str = '', group_id: str = '', mechanism: str = '', security: str = '', username: str = '', password: str = ''):
         """ Initializes the Kafka object.
@@ -326,8 +348,10 @@ class Kafka(MessageBroker):
         # Initialize Kafka producer
         self.kafka_producer = Producer(kafkaP_settings)
 
-    def ReceiveMessages(self) -> list[dict]:
-        """ Receives messages from the Kafka topic.
+
+    def receive_message(self) -> list[dict]:
+        """ Receives message from the Kafka topic.
+
         """
 
         # Poll for messages from the Kafka consumer
@@ -338,10 +362,12 @@ class Kafka(MessageBroker):
             return []
         
         # Otherwise, return the received message
-        return [json.loads(msg.value())]
+        return json.loads(msg.value())
+
 
     def delivery_callback(self, err, msg):
         """ Callback function to handle message delivery.
+
         """
 
         # If there's an error, write it to stderr
@@ -352,8 +378,10 @@ class Kafka(MessageBroker):
             sys.stderr.write('%% Message delivered to %s [%d] @ %d\n' %
                              (msg.topic(), msg.partition(), msg.offset()))
 
-    def SendMessage(self, message: str):
+
+    def send_message(self, message: str):
         """ Sends a message to the Kafka topic.
+
         """
 
         try:
@@ -370,8 +398,10 @@ class Kafka(MessageBroker):
             # Poll for events from the Kafka producer
             self.kafka_producer.poll(1)
 
-    def Close(self) -> bool:
+
+    def close(self) -> bool:
         """ Closes the connection to Kafka.
+
         """
 
         # Close the Kafka consumer and producer, and flush the producer's messages
@@ -381,167 +411,3 @@ class Kafka(MessageBroker):
         
         return True
     
-
-
-class KerberosVaultIntegrated(MessageBroker):
-    def __init__(self, 
-                 rmq_source_queue_name: str = '', rmq_target_queue_name: str = '', rmq_exchange: str = '', rmq_host: str = '', rmq_username: str = '', rmq_password: str = '',
-                 aws_source_queue_name: str = '', aws_access_key_id: str = '', aws_secret_access_key: str = '',
-                 kafka_source_queue_name: str = '', kafka_broker: str = '', kafka_group_id: str = '', kafka_mechanism: str = '', kafka_security: str = '', kafka_username: str = '', kafka_password: str = '',
-                 storage_uri: str = '', storage_access_key: str = '', storage_secret: str = ''
-                ):
-        """ Initializes the QueueProcessor object with necessary attributes.
-        Uses the provided source queue system to initialize the queue object, and initializes the Kerberos Vault Integrator.
-
-        Parameters:
-        -----------
-        
-        RabbitMQ Parameters:
-        rmq_source_queue_name : str
-            The name of the source queue in RabbitMQ.
-        rmq_target_queue_name : str
-            The name of the target queue in RabbitMQ.
-        rmq_exchange : str
-            The exchange name in RabbitMQ.
-        rmq_host : str
-            The host name of the RabbitMQ server.
-        rmq_username : str
-            The username for RabbitMQ server.
-        rmq_password : str
-            The password for RabbitMQ server.
-
-        AWS SQS Parameters:
-        aws_source_queue_name : str
-            The name of the source queue in AWS SQS.
-        aws_access_key_id : str
-            The access key for AWS SQS.
-        aws_secret_access_key : str
-            The secret key for AWS SQS.
-
-        Kafka Parameters:
-        kafka_source_queue_name : str
-            The name of the source queue in Kafka.
-        kafka_broker : str
-            The broker URL for Kafka.
-        kafka_group_id : str
-            The group ID for Kafka.
-        kafka_mechanism : str
-            The security mechanism for Kafka.
-        kafka_security : str
-            The security protocol for Kafka.
-        kafka_username : str
-            The username for Kafka.
-        kafka_password : str
-            The password for Kafka.
-
-        Kerberos Vault Integrator Parameters:
-        storage_uri : str
-            The URI of the storage service.
-        storage_access_key : str
-            The access key for the storage service.
-        storage_secret : str
-            The secret key for the storage service.
-        
-        """
-        
-        # Initialize Kerberos Vault Integrator
-        self.kerberos_vault_integrator = KerberosVaultIntegrator.KerberosVaultIntegrator(storage_uri, storage_access_key, storage_secret)
-
-        # Initialize source queue based on the provided source queue system
-        if rmq_source_queue_name != '':
-            self.queue = RabbitMQ(queue_name = rmq_source_queue_name, target_queue_name = rmq_target_queue_name, exchange = rmq_exchange, host = rmq_host, username = rmq_username, password = rmq_password)
-        
-        elif aws_source_queue_name != '':
-            self.queue = SQS(queue_name  = aws_source_queue_name, aws_access_key_id = aws_access_key_id, aws_secret_access_key = aws_secret_access_key)
-        
-        elif kafka_source_queue_name != '':
-            self.queue = Kafka(queue_name = kafka_source_queue_name, broker = kafka_broker, group_id = kafka_group_id, mechanism = kafka_mechanism, security = kafka_security, username = kafka_username, password = kafka_password)
-        
-        else:
-            # Raise an exception if an invalid source queue system is provided
-            raise ValueError("Please provide a source_queue_name for either RabbitMQ, AWS SQS, or Kafka with the necessary credentials")
-        
-
-    
-    def ReceiveMessages(self, type: str = '', filepath: str = ''):
-        """ Processes message received from the source queue, fetches associated data from storage, and performs actions.
-
-        Parameters:
-        -----------
-        type : str
-            The type of message to be processed (video). Default is an empty string.
-            if type is 'video', the message is processed and video file is created. Filepath is returned.
-            else, the message response is returned.
-        
-        filepath : str
-            The path where the video file is to be saved. Default is an empty string.
-        """
-
-        try:
-            # Receive messages from the source queue
-            messages = self.queue.ReceiveMessages()
-
-        except Exception as e:
-            print('Error occurred while trying to receive message:')
-            print(e)
-            traceback.print_exc()
-            pass
-
-
-        # Process messages until successful response is received or all messages are processed
-        for body in messages:
-
-            # Update storage-related information if available in message payload
-            if "data" in body:
-                self.kerberos_vault_integrator.update_storage_info(body['data'])
-
-            # Create headers for accessing storage service
-            headers = self.kerberos_vault_integrator.create_headers(body['payload']['key'], body['source'])
-
-            try:
-                # Fetch data associated with the message from storage service
-                resp = requests.get(self.kerberos_vault_integrator.storage_uri + "/storage/blob", headers=headers, timeout=10)
-
-                if resp is None or resp.status_code != 200:
-                    print('None response or non-200 status code, skipping...')
-                    continue
-
-                if type == 'video':
-                    # From the received requested data, reconstruct a video-file.
-                    # This creates a video-file in the data folder, containing the recording.
-                    with open(filepath, 'wb') as output:
-                        output.write(resp.content)
-            
-                    return filepath
-                
-                else:
-                    return resp
-                
-            except Exception as x:
-                print('Error occurred while trying to fetch data from storage:')
-                print(x)
-                traceback.print_exc()
-                pass
-    
-
-
-    def SendMessage(self, message):
-        """ Sends message to the target queue.
-
-        Parameters:
-        -----------
-        message : dict
-            The message to be sent to the target queue.
-        """
-
-        # Send message to the target queue
-        self.queue.SendMessage(message)
-
-
-
-    def Close(self):
-        """ Closes the connection to the source queue.
-        """
-
-        # Close the connection to the source queue
-        self.queue.Close()
