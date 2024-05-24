@@ -44,15 +44,15 @@ After you have finished using the message broker system and no longer need to re
 The code snippet provided demonstrates the usage of the MessageBrokers library in Python. It showcases how to initialize a connection to a message broker system, receives a message from a queue, send a message to the queue, and close the connection. The library abstracts away the complexities of interacting with different message broker systems, allowing developers to focus on writing their application logic.
 
 ```python
-from uugai_python_dynamic_queue import MessageBrokers
+from uugai_python_dynamic_queue.MessageBrokers import RabbitMQ
 
 # Initialize a connection to RabbitMQ message broker
-rabbitmq = MessageBrokers.RabbitMQ(queue_name='my_queue', 
-                                   target_queue_name = 'my_target_queue', 
-                                   exchange='my_exchange', 
-                                   host='host', 
-                                   username='guest',
-                                   password='guest')
+rabbitmq = RabbitMQ(queue_name='my_queue', 
+                    target_queue_name = 'my_target_queue', 
+                    exchange='my_exchange', 
+                    host='host', 
+                    username='guest',
+                    password='guest')
 
 # Receive message from the queue
 message = rabbitmq.receive_messages()
