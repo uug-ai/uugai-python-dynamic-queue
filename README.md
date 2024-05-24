@@ -4,10 +4,10 @@ MessageBrokers is a Python library that provides a simple and efficient way to w
 
 ## Installation
 To install MessageBrokers you can use pip, the package is listed on PyPi:
-`pip install python_queue_reader`
+`pip install uugai_python_dynamic_queue`
 
 The package can be imported in your Python document using:
-`from python_queue_reader import MessageBrokers`
+`from uugai_python_dynamic_queue import MessageBrokers`
 
 ## Features
 Supports popular message broker systems such as **RabbitMQ**, **SQS**, and **Kafka**. Abstracted to following methods:
@@ -44,7 +44,7 @@ After you have finished using the message broker system and no longer need to re
 The code snippet provided demonstrates the usage of the MessageBrokers library in Python. It showcases how to initialize a connection to a message broker system, receives a message from a queue, send a message to the queue, and close the connection. The library abstracts away the complexities of interacting with different message broker systems, allowing developers to focus on writing their application logic.
 
 ```python
-from python_queue_reader import MessageBrokers
+from uugai_python_dynamic_queue import MessageBrokers
 
 # Initialize a connection to RabbitMQ message broker
 rabbitmq = MessageBrokers.RabbitMQ(queue_name='my_queue', 
