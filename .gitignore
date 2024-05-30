@@ -1,4 +1,5 @@
 build
 dist
-python_queue_reader.egg-info
+uugai_python_dynamic_queue.egg-info
+uugai_python_dynamic_queue
 .venv

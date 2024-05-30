@@ -3,11 +3,12 @@
 MessageBrokers is a Python library that provides a simple and efficient way to work with message brokers such as RabbitMQ, Amazon SQS and Apache Kafka. It abstracts away the complexities of interacting with different message broker systems, allowing you to focus on writing your application logic.
 
 ## Installation
-To install MessageBrokers you can use pip, the package is listed on PyPi:
-`pip install uugai_python_dynamic_queue`
+To install MessageBrokers you can use pip, the package is listed on [PyPi](https://pypi.org/project/uugai-python-dynamic-queue/)
+* installation using pip: `pip install uugai_python_dynamic_queue`
 
-The package can be imported in your Python document using:
-`from uugai_python_dynamic_queue import MessageBrokers`
+The package can be imported in your Python file using:
+* for all supported messagebrokers: `from uugai_python_dynamic_queue import MessageBrokers` 
+* more specific for one message broker: `from uugai_python_dynamic_queue.MessageBrokers import RabbitMQ`
 
 ## Features
 Supports popular message broker systems such as **RabbitMQ**, **SQS**, and **Kafka**. Abstracted to following methods:
