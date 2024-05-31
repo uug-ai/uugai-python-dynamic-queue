@@ -91,8 +91,13 @@ class RabbitMQ(MessageBroker):
         self.connect()
 
         # Declare quorum queue
-        self.readChannel.queue_declare(queue=self.queue_name, durable=True, arguments={
-                                       'x-queue-type': 'quorum'})
+        try:
+            self.readChannel.queue_declare(
+                queue=self.queue_name,
+                durable=True, 
+                arguments={'x-queue-type': 'quorum'})
+        except AttributeError:
+            raise Exception("Connection to RabbitMQ is not opened, have you filled in the correct credentials?")
 
         # Check if connection is open otherwise kill
         if not self.connection.is_open:

@@ -5,7 +5,7 @@ with open('requirements.txt') as f:
 
 setup(
    name='uugai_python_dynamic_queue',
-   version='1.1.0',
+   version='2.0.0',
    description='Queue reader for python abstracting message brokers such as RabbitMQ', 
    author='uug.ai',
    author_email='support@uug.ai',
